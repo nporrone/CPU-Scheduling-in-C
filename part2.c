@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
 
         // Call CPU Scheduling algorithms
 
-        FILE *out_file = fopen("cpu_scheduling_output_file.tx", "w"); // write only
+        FILE *out_file = fopen("cpu_scheduling_output_file.txt", "w"); // write only
         int queue_count = 1; // Used for printing
         for(int i = 0; i < 100; i++) { // while the array holding all ready queues is not empty
             fcfs(queueHolder[i],queue_count,out_file);
