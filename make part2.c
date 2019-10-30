@@ -87,17 +87,17 @@ struct Process* dequeue(struct Queue* queue)
     return item;
 }
 
-void fcfs(struct Queue *current_queue, int queue_count);  // First come first serve
+void fcfs(struct Queue *current_queue, int queue_count,FILE *out_file);  // First come first serve
 
-void sjf(struct Queue *current_queue, int queue_count); // Shortest Job First
+void sjf(struct Queue *current_queue, int queue_count, FILE *out_file); // Shortest Job First
 
-void rr(struct Queue *current_queue, int queue_count); // Round Robin
+void rr(struct Queue *current_queue, int queue_count, FILE *out_file); // Round Robin
 
-void printFCFS(struct Process *pProcess[100], int pcount, int qcount, int avgwait); // helper used to print FCFS
+void printFCFS(struct Process *pProcess[100], int pcount, int qcount, int avgwait, FILE *out_file); // helper used to print FCFS
 
-void printSJF(struct Process *pProcess[100], int pcount, int qcount, int avgwait); // helper used to print SJF
+void printSJF(struct Process *pProcess[100], int pcount, int qcount, int avgwait, FILE *out_file); // helper used to print SJF
 
-void printRR(struct Process *pProcess[100], struct Process *orderToPrint[100], int pcount, int qcount); // helper used to print RR
+void printRR(struct Process *pProcess[100], struct Process *orderToPrint[100], int pcount, int qcount, FILE *out_file); // helper used to print RR
 
 int main(int argc, char **argv) {
     // Check the correct amount of arguments are given
@@ -152,22 +152,24 @@ int main(int argc, char **argv) {
 
         // Call CPU Scheduling algorithms
 
+        FILE *out_file = fopen("cpu_scheduling_output_file.tx", "w"); // write only
         int queue_count = 1; // Used for printing
-
         for(int i = 0; i < 100; i++) { // while the array holding all ready queues is not empty
-            fcfs(queueHolder[i],queue_count);
-            sjf(queueHolder[i],queue_count);
-            rr(queueHolder[i],queue_count);
+            fcfs(queueHolder[i],queue_count,out_file);
+            sjf(queueHolder[i],queue_count,out_file);
+            rr(queueHolder[i],queue_count,out_file);
             queue_count += 1;
         }
-
+        fclose(out_file);
     }
 
 
 
 }
 
-void fcfs(struct Queue *current_queue, int queue_count) {
+// First come first serve
+
+void fcfs(struct Queue *current_queue, int queue_count, FILE *out_file) {
 
     struct Process *completed[100];
 
@@ -193,7 +195,7 @@ void fcfs(struct Queue *current_queue, int queue_count) {
 
     if (process_count > 0 ) { // check if queue is full
         averageWaitTime = totalWaitTime/process_count; // compute average wait time
-        printFCFS(completed,process_count,queue_count,averageWaitTime);
+        printFCFS(completed,process_count,queue_count,averageWaitTime,out_file);
 
         // Fill up the Queue again so it can still be used again
         for(int i = 0; i < process_count; i++){
@@ -204,7 +206,7 @@ void fcfs(struct Queue *current_queue, int queue_count) {
 
 // Shortest Job First
 
-void sjf(struct Queue *current_queue, int queue_count) {
+void sjf(struct Queue *current_queue, int queue_count, FILE *out_file) {
 
     struct Process *save[100];
     struct Process *completed[100];
@@ -258,7 +260,7 @@ void sjf(struct Queue *current_queue, int queue_count) {
 
     if (process_count > 0 ) { // check if queue is full
         averageWaitTime = totalWaitTime/process_count; // compute average wait time
-        printSJF(completedSorted,process_count,queue_count,averageWaitTime);
+        printSJF(completedSorted,process_count,queue_count,averageWaitTime, out_file);
 
         // Fill up the Queue again so it can still be used again
         for(int i = 0; i < process_count; i++){
@@ -267,13 +269,14 @@ void sjf(struct Queue *current_queue, int queue_count) {
     }
 }
 
-void rr(struct Queue *current_queue, int queue_count) {
+// Round Robin
+
+void rr(struct Queue *current_queue, int queue_count, FILE *out_file) {
 
     struct Process *completed[100]; // final product
     struct Process *save[100]; // used to save the queue
 
     int timeElapsed = 0; // running total on the time count
-    int totalWaitTime = 0; // running total on the wait time - used to calculate avg wait time.
     int process_count = 0; // counter for the process'
 
     while (!isEmpty(current_queue)) {  // while the ready queue is not empty
@@ -339,7 +342,7 @@ void rr(struct Queue *current_queue, int queue_count) {
 
 
     if (process_count > 0 ) { // check if queue is full
-        printRR(completed,save,process_count,queue_count);
+        printRR(completed,save,process_count,queue_count, out_file);
 
         // Fill up the Queue again so it can still be used again
         for(int i = 0; i < process_count; i++){
@@ -348,56 +351,55 @@ void rr(struct Queue *current_queue, int queue_count) {
     }
 }
 
-
-
-
 // Helper function used to print the schedule of a queue for FCFS
 
-void printFCFS(struct Process *processToPrint[100], int pcount, int qcount, int avgwait) {
-    printf("---------------------------------------------------------------------------------------------\n");
-    printf("Ready Queue %d Applying FCFS Scheduling: \n",qcount);
-    printf("\nOrder of selection by CPU: \n");
+void printFCFS(struct Process *processToPrint[100], int pcount, int qcount, int avgwait, FILE *out_file) {
+    fprintf(out_file,"---------------------------------------------------------------------------------------------\n");
+    fprintf(out_file,"Ready Queue %d Applying FCFS Scheduling: \n",qcount);
+    fprintf(out_file,"\nOrder of selection by CPU: \n");
     for (int i = 0; i < pcount; i++) {
-        printf("p%d ", processToPrint[i]->processId);
+        fprintf(out_file,"p%d ", processToPrint[i]->processId);
     }
 
-    printf("\n\nIndividual waiting times for each process:\n");
+    fprintf(out_file,"\n\nIndividual waiting times for each process:\n");
     for (int i = 0; i < pcount; i++) {
-        printf("p%d = %d\n", processToPrint[i]->processId, processToPrint[i]->waitTime);
+        fprintf(out_file,"p%d = %d\n", processToPrint[i]->processId, processToPrint[i]->waitTime);
     }
 
-    printf("\nAverage waiting time = %d\n", avgwait);
+    fprintf(out_file,"\nAverage waiting time = %d\n", avgwait);
 }
 
 // Helper function used to print the schedule of a queue for SJB
 
-void printSJF(struct Process *processToPrint[100], int pcount, int qcount, int avgwait) {
-    printf("---------------------------------------------------------------------------------------------\n");
-    printf("Ready Queue %d Applying SJF Scheduling: \n",qcount);
-    printf("\nOrder of selection by CPU: \n");
+void printSJF(struct Process *processToPrint[100], int pcount, int qcount, int avgwait, FILE *out_file) {
+    fprintf(out_file,"---------------------------------------------------------------------------------------------\n");
+    fprintf(out_file,"Ready Queue %d Applying SJF Scheduling: \n",qcount);
+    fprintf(out_file,"\nOrder of selection by CPU: \n");
     for (int i = 0; i < pcount; i++) {
-        printf("p%d ", processToPrint[i]->processId);
+        fprintf(out_file,"p%d ", processToPrint[i]->processId);
     }
 
-    printf("\n\nIndividual waiting times for each process:\n");
+    fprintf(out_file,"\n\nIndividual waiting times for each process:\n");
     for (int i = 0; i < pcount; i++) {
-        printf("p%d = %d\n", processToPrint[i]->processId, processToPrint[i]->waitTime);
+        fprintf(out_file,"p%d = %d\n", processToPrint[i]->processId, processToPrint[i]->waitTime);
     }
 
-    printf("\nAverage waiting time = %d\n", avgwait);
+    fprintf(out_file,"\nAverage waiting time = %d\n", avgwait);
 }
 
-void printRR(struct Process *processToPrint[100],struct Process *processOrder[100], int pcount, int qcount) {
-    printf("---------------------------------------------------------------------------------------------\n");
-    printf("Ready Queue %d Applying RR Scheduling: \n",qcount);
-    printf("\nOrder of selection by CPU: \n");
+// Helper function used to print the schedule of a queue for RR
+
+void printRR(struct Process *processToPrint[100],struct Process *processOrder[100], int pcount, int qcount, FILE *out_file) {
+    fprintf(out_file,"---------------------------------------------------------------------------------------------\n");
+    fprintf(out_file,"Ready Queue %d Applying RR Scheduling: \n",qcount);
+    fprintf(out_file,"\nOrder of selection by CPU: \n");
     for (int i = 0; i < pcount; i++) {
-        printf("p%d ", processOrder[i]->processId);
+        fprintf(out_file,"p%d ", processOrder[i]->processId);
     }
 
-    printf("\n\nIndividual Turnaround times for each process:\n");
+    fprintf(out_file,"\n\nIndividual Turnaround times for each process:\n");
     for (int i = 0; i < pcount; i++) {
-        printf("p%d = %d\n", processToPrint[i]->processId, processToPrint[i]->turnaroundTime);
+        fprintf(out_file,"p%d = %d\n", processToPrint[i]->processId, processToPrint[i]->turnaroundTime);
     }
 
 }
