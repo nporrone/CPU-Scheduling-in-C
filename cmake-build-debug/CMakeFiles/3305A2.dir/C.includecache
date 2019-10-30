@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/c/Users/nporr/CLionProjects/3305A2/make part2.c
+sys/wait.h
+-
+stdio.h
+-
+sys/types.h
+-
+unistd.h
+-
+pthread.h
+-
+stdio.h
+-
+stdlib.h
+-
+limits.h
+-
+string.h
+-
+

@@ -1,0 +1,1 @@
+/usr/bin/cc -g  -Wl,--enable-auto-import CMakeFiles/3305A2.dir/make_part2.c.o  -o 3305A2.exe -Wl,--out-implib,lib3305A2.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
